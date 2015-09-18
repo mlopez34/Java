@@ -1,5 +1,6 @@
 import java.util.Iterator;
 import edu.princeton.cs.algs4.StdRandom;
+import edu.princeton.cs.algs4.StdOut;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
    
@@ -46,33 +47,17 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
        }
        int ran = StdRandom.uniform(N);
        Item tmp = randQ[ran];
-       //StdOut.println("randomed " + ran);
-       randQ[ran] = null;
+       randQ[ran] = randQ[N-1];
+       randQ[N-1] = tmp;
+       randQ[N-1] = null;
        if (size() == randQ.length/4)
        {
            //  reduce to half the size
            Item[] newQ = (Item[])new Object[randQ.length/2];
+           
            for (int i =0; i < newQ.length; i++)
            {
-               if (randQ[i] != null){
-                   newQ[i] = randQ[i];
-               }
-               else{
-                   newQ[i] = randQ[i+1];
-               }
-           }
-           randQ = newQ;
-       }
-       else{
-           Item[] newQ = (Item[])new Object[randQ.length];
-           for (int i =0; i < newQ.length-1; i++)
-           {
-               if (i < ran){
-                   newQ[i] = randQ[i];
-               }
-               else{
-                   newQ[i] = randQ[i+1];
-               }
+                newQ[i] = randQ[i];
            }
            randQ = newQ;
        }
@@ -127,6 +112,25 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
    
    public static void main(String[] args)   // unit testing
    {
+       RandomizedQueue<Integer> rq = new RandomizedQueue<Integer>();
+       rq.enqueue(0);
+       rq.enqueue(1);
+       rq.enqueue(2);
+       rq.enqueue(3);
+       rq.enqueue(4);
+       rq.enqueue(5);
+       rq.enqueue(6);
+       rq.enqueue(7);
+       rq.enqueue(8);
+       StdOut.println(rq.dequeue());
+       StdOut.println(rq.dequeue());
+       StdOut.println(rq.dequeue());
+       StdOut.println(rq.dequeue());
+       StdOut.println(rq.dequeue());
+       StdOut.println(rq.dequeue());
+       StdOut.println(rq.dequeue());
+       StdOut.println(rq.dequeue());
+       StdOut.println(rq.dequeue());
        
    }
 }
