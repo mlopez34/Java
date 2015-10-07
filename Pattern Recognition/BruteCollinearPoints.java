@@ -7,6 +7,7 @@ import edu.princeton.cs.algs4.StdOut;
 public class BruteCollinearPoints {
    private int N = 0;
    private ArrayList<LineSegment> ls;
+   
    public BruteCollinearPoints(Point[] points)    // finds all line segments containing 4 points
    {
        if (points == null)
@@ -16,14 +17,30 @@ public class BruteCollinearPoints {
        ls = new ArrayList();
        for (int i = 0; i < points.length; i++)
        {
+           if (points[i] == null)
+           {
+               throw new java.lang.NullPointerException();
+           }
            for ( int j = i+1; j < points.length; j++)
            {
+               if (points[j] == null)
+               {
+                   throw new java.lang.NullPointerException();
+               }
                for (int k = j+1; k < points.length; k++)
                {
+                   if (points[k] == null)
+                   {
+                       throw new java.lang.NullPointerException();
+                   }
                    if (points[i].slopeTo(points[j]) == points[i].slopeTo(points[k])){
                        
                        for (int l = k+1; l < points.length; l++)
                        {
+                           if (points[l] == null)
+                           {
+                               throw new java.lang.NullPointerException();
+                           }
                            if (points[i].slopeTo(points[k]) == points[i].slopeTo(points[l]))
                            {
                                
