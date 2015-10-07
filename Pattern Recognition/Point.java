@@ -56,14 +56,18 @@ public class Point implements Comparable<Point> {
    }
    public double slopeTo(Point that)
    {
-       // the slope between this point and that point
-       if (this.x == that.x)
+       if (that == null)
        {
-           return +0;
+           throw new java.lang.NullPointerException();
        }
-       if (this.y == that.y)
+       // the slope between this point and that point
+       if (this.x == that.x && this.y != that.y)
        {
            return Double.POSITIVE_INFINITY;
+       }
+       if (this.y == that.y && this.x != that.x)
+       {
+           return +0;
        }
        if (this.y == that.y && this.x == that.x)
        {

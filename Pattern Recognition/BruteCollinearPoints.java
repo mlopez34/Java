@@ -14,67 +14,37 @@ public class BruteCollinearPoints {
        {
            throw new java.lang.NullPointerException();
        }
+       checkRepeats(points);
        ls = new ArrayList();
        for (int i = 0; i < points.length; i++)
        {
-           if (points[i] == null)
-           {
-               throw new java.lang.NullPointerException();
-           }
+           validate(points[i]);
            for ( int j = i+1; j < points.length; j++)
            {
-               if (points[j] == null)
-               {
-                   throw new java.lang.NullPointerException();
-               }
+               validate(points[j]);
                for (int k = j+1; k < points.length; k++)
                {
-                   if (points[k] == null)
-                   {
-                       throw new java.lang.NullPointerException();
-                   }
+                   validate(points[k]);
                    if (points[i].slopeTo(points[j]) == points[i].slopeTo(points[k])){
                        
                        for (int l = k+1; l < points.length; l++)
                        {
-                           if (points[l] == null)
-                           {
-                               throw new java.lang.NullPointerException();
-                           }
+                           validate(points[l]);
                            if (points[i].slopeTo(points[k]) == points[i].slopeTo(points[l]))
                            {
-                               
                                //get the min and max pts in the line seg
                                
                                Point[] temp = new Point[] {points[i], points[j], points[k], points[l]};
-                               //StdOut.println(temp[0] + "->" + temp[1] + "->" + temp[2]+ "->" + temp[3] + " slope i to k " + 
-                                              //points[i].slopeTo(points[k]) + " slope i to l " + points[i].slopeTo(points[l]));
+                               
                                Arrays.sort(temp);
-                               //StdOut.println("sorted " + temp[0] + "->" + temp[1] + "->" + temp[2]+ "->" + temp[3]);
+                               //check repeats
+                               
                                Point min = temp[0];
                                Point max = temp[3];
                                LineSegment line = new LineSegment(min, max);
-                               Boolean found = false;
-                               if (ls.size() == 0)
-                               {
-                                   ls.add(line);
-                                   N = N+1;
-                               }
-                               else{
-                                   for (LineSegment seg : ls)
-                                   {
-                                       if (seg.toString().equals(line.toString()))
-                                       {
-                                           found = true;
-                                           break;
-                                       }
-                                   }
-                                   if (!found)
-                                   {
-                                       ls.add(line);
-                                       N = N+1;
-                                   }
-                               }
+                               
+                               ls.add(line);
+                               //N = N+1;
                                
                            }
                        }
@@ -82,7 +52,56 @@ public class BruteCollinearPoints {
                }
            }
        }
+       ArrayList<LineSegment> noDups = new ArrayList<LineSegment>();
+       for (LineSegment segment : ls)
+       {
+           if (noDups.size() == 0)
+           {
+               noDups.add(segment);
+               N = N+1;
+           }
+           else{
+               Boolean found = false;
+               for (LineSegment seg : noDups)
+               {
+                   if (seg.toString().equals(segment.toString()))
+                   {
+                       found = true;
+                       break;
+                   }
+               }
+               if (!found)
+               {
+                   noDups.add(segment);
+                   N = N+1;
+               }
+           }
+       }
+       ls = noDups;
        //System.out.println(N);
+   }
+   private void checkRepeats(Point[] points)
+   {
+       Point[] copy = new Point[points.length];
+       for (int i = 0; i < copy.length; i++)
+       {
+           copy[i] = points[i];
+       }
+       Arrays.sort(copy);
+       for (int i = 0; i < copy.length-1; i++)
+       {
+           if (copy[i].compareTo(copy[i+1]) == 0)
+           {
+               throw new java.lang.IllegalArgumentException();
+           }
+       }
+   }
+   private void validate(Point p)
+   {
+       if (p == null)
+       {
+           throw new java.lang.NullPointerException();
+       }
    }
    public int numberOfSegments()        // the number of line segments
    {
@@ -91,6 +110,7 @@ public class BruteCollinearPoints {
    public LineSegment[] segments()                // the line segments
    {
        LineSegment[] s = new LineSegment[N];
+       
        s = ls.toArray(s);
        return s;
    }

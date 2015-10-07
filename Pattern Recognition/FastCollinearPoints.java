@@ -14,6 +14,7 @@ public class FastCollinearPoints {
        {
            throw new java.lang.NullPointerException();
        }
+       checkRepeats(points);
        ls = new ArrayList();
        for (int i = 0; i < points.length; i++)
        {
@@ -32,18 +33,25 @@ public class FastCollinearPoints {
                    toSortIndex++;
                }
            }
+           if (toSort.length < 1)
+           {
+               break;
+           }
            Arrays.sort(toSort, points[i].slopeOrder());
            
            int index = 0;
-           double currentSlope = points[i].slopeTo(toSort[index]);
+           //double currentSlope = points[i].slopeTo(toSort[index]);
            
            while(index < toSort.length){
-               currentSlope = points[i].slopeTo(toSort[index]);
+               double currentSlope = points[i].slopeTo(toSort[index]);
                int count = 0;
                int initial = index;
+               boolean skipped = false;
                while(index < toSort.length && points[i].slopeTo(toSort[index]) == currentSlope){
                    count++;
                    index++;
+                   skipped = true;
+                   
                }
                if (count >= 3)
                {
@@ -55,35 +63,58 @@ public class FastCollinearPoints {
                    }
                    Arrays.sort(pointsInLine);
                    LineSegment line = new LineSegment(pointsInLine[0], pointsInLine[pointsInLine.length-1]);
-                   Boolean found = false;
-                   
-                   if (ls.size() == 0)
-                   {
-                       ls.add(line);
-                       N = N+1;
-                   }
-                   else{
-                       for (LineSegment seg : ls)
-                       {
-                           if (seg.toString().equals(line.toString()))
-                           {
-                               found = true;
-                               break;
-                           }
-                       }
-                       if (!found)
-                       {
-                           ls.add(line);
-                           N = N+1;
-                       }
-                   }
+                   ls.add(line);
+                       
                }
-               index++;
+               if(!skipped){
+                   index++;
+               }
            }
        }
+       ArrayList<LineSegment> noDups = new ArrayList<LineSegment>();
+       for (LineSegment segment : ls)
+       {
+           if (noDups.size() == 0)
+           {
+               noDups.add(segment);
+               N = N+1;
+           }
+           else{
+               Boolean found = false;
+               for (LineSegment seg : noDups)
+               {
+                   if (seg.toString().equals(segment.toString()))
+                   {
+                       found = true;
+                       break;
+                   }
+               }
+               if (!found)
+               {
+                   noDups.add(segment);
+                   N = N+1;
+               }
+           }
+       }
+       ls = noDups;
        
    }
-   
+   private void checkRepeats(Point[] points)
+   {
+       Point[] copy = new Point[points.length];
+       for (int i = 0; i < copy.length; i++)
+       {
+           copy[i] = points[i];
+       }
+       Arrays.sort(copy);
+       for (int i = 0; i < copy.length-1; i++)
+       {
+           if (copy[i].compareTo(copy[i+1]) == 0)
+           {
+               throw new java.lang.IllegalArgumentException();
+           }
+       }
+   }
    private void validate(Point p)
    {
        if (p == null)
