@@ -1,6 +1,5 @@
 import java.util.Comparator;
 import edu.princeton.cs.algs4.StdDraw;
-import edu.princeton.cs.algs4.StdOut;
 
 public class Point implements Comparable<Point> {
    
@@ -47,7 +46,8 @@ public class Point implements Comparable<Point> {
            {
                return -1;
            }
-           else{
+           else 
+           {
                return 0;
            }
        }
@@ -73,7 +73,7 @@ public class Point implements Comparable<Point> {
        {
            return Double.NEGATIVE_INFINITY;
        }
-       double slope = (double)(that.y - this.y)/(double)(that.x - this.x);
+       double slope = (double) (that.y - this.y)/(double) (that.x - this.x);
        
        return slope;
    }
@@ -83,11 +83,11 @@ public class Point implements Comparable<Point> {
        // compare two points by slopes they make with this point
        return new SLOPEORDER();
    }
-   private class SLOPEORDER implements  Comparator<Point>{
+   private class SLOPEORDER implements  Comparator<Point> {
        
        public int compare(Point p1, Point p2)
        {
-           Point p = new Point(x,y);
+           Point p = new Point(x , y);
            double d = p.slopeTo(p1) - p.slopeTo(p2);
            if (d > 0)
            {

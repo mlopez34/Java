@@ -3,10 +3,13 @@ import java.util.Arrays;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
+import java.util.HashMap;
 
 public class BruteCollinearPoints {
    private int N = 0;
    private ArrayList<LineSegment> ls;
+   private HashMap<Double, ArrayList<Point>> map;
+   
    
    public BruteCollinearPoints(Point[] points)    // finds all line segments containing 4 points
    {
@@ -15,21 +18,19 @@ public class BruteCollinearPoints {
            throw new java.lang.NullPointerException();
        }
        checkRepeats(points);
+       validate(points);
        ls = new ArrayList();
+       map = new HashMap<Double, ArrayList<Point>>();
        for (int i = 0; i < points.length; i++)
        {
-           validate(points[i]);
-           for ( int j = i+1; j < points.length; j++)
+           for (int j = i+1; j < points.length; j++)
            {
-               validate(points[j]);
                for (int k = j+1; k < points.length; k++)
                {
-                   validate(points[k]);
                    if (points[i].slopeTo(points[j]) == points[i].slopeTo(points[k])){
                        
                        for (int l = k+1; l < points.length; l++)
                        {
-                           validate(points[l]);
                            if (points[i].slopeTo(points[k]) == points[i].slopeTo(points[l]))
                            {
                                //get the min and max pts in the line seg
@@ -42,43 +43,34 @@ public class BruteCollinearPoints {
                                Point min = temp[0];
                                Point max = temp[3];
                                LineSegment line = new LineSegment(min, max);
-                               
-                               ls.add(line);
-                               //N = N+1;
-                               
+                               Double currentSlope = points[i].slopeTo(points[l]);
+                               if (!map.containsKey(currentSlope))
+                               {
+                                   //point is not even in a segment check if 
+                                   ls.add(line);
+                                   ArrayList<Point> tmp = new ArrayList<Point>();
+                                   tmp.add(max);
+                                   map.put(currentSlope, tmp);
+                                   N++;
+                               }
+                               else if ( map.containsKey(currentSlope))
+                               {
+                                   ArrayList<Point> tmp = map.get(currentSlope);
+                                   if (tmp.contains(max))
+                                   {
+                                       continue;
+                                   }
+                                   ls.add(line);
+                                   N++;
+                                   tmp.add(max);
+                                   map.put(currentSlope, tmp);
+                               }
                            }
                        }
                    }
                }
            }
        }
-       ArrayList<LineSegment> noDups = new ArrayList<LineSegment>();
-       for (LineSegment segment : ls)
-       {
-           if (noDups.size() == 0)
-           {
-               noDups.add(segment);
-               N = N+1;
-           }
-           else{
-               Boolean found = false;
-               for (LineSegment seg : noDups)
-               {
-                   if (seg.toString().equals(segment.toString()))
-                   {
-                       found = true;
-                       break;
-                   }
-               }
-               if (!found)
-               {
-                   noDups.add(segment);
-                   N = N+1;
-               }
-           }
-       }
-       ls = noDups;
-       //System.out.println(N);
    }
    private void checkRepeats(Point[] points)
    {
@@ -96,11 +88,14 @@ public class BruteCollinearPoints {
            }
        }
    }
-   private void validate(Point p)
+   private void validate(Point[] p)
    {
-       if (p == null)
+       for (int i = 0; i < p.length-1; i++)
        {
-           throw new java.lang.NullPointerException();
+           if (p == null)
+           {
+               throw new java.lang.IllegalArgumentException();
+           }
        }
    }
    public int numberOfSegments()        // the number of line segments

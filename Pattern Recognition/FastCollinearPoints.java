@@ -3,55 +3,43 @@ import java.util.Arrays;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
+import java.util.HashMap;
 
 public class FastCollinearPoints {
    private int N = 0;
    private ArrayList<LineSegment> ls;
+   private HashMap<Double, ArrayList<Point>> map;
+   private Point[] points2;
    
    public FastCollinearPoints(Point[] points)     // finds all line segments containing 4 or more points
    {
+       points2 = new Point[points.length];
+       System.arraycopy(points, 0, points2, 0, points2.length);
+       
        if (points == null)
        {
            throw new java.lang.NullPointerException();
        }
        checkRepeats(points);
        ls = new ArrayList();
-       for (int i = 0; i < points.length; i++)
+       map = new HashMap<Double, ArrayList<Point>>();
+       for (int i = 0; i < points2.length; i++)
        {
-           validate(points[i]);
-           
-           Point[] toSort = new Point[points.length-1];
-           int toSortIndex = 0;
-           
-           for (int j = 0; j < points.length; j++)
-           {
-               validate(points[j]);
-               if (i != j)
-               {
-                   //StdOut.println( i + " " + j);
-                   toSort[toSortIndex] = points[j];
-                   toSortIndex++;
-               }
-           }
-           if (toSort.length < 1)
-           {
-               break;
-           }
-           Arrays.sort(toSort, points[i].slopeOrder());
-           
+           validate(points2);
+           Boolean done = false;
+           Arrays.sort(points2, points[i].slopeOrder());
            int index = 0;
-           //double currentSlope = points[i].slopeTo(toSort[index]);
            
-           while(index < toSort.length){
-               double currentSlope = points[i].slopeTo(toSort[index]);
+           while(index < points2.length){
+               double currentSlope = points[i].slopeTo(points2[index]);
                int count = 0;
                int initial = index;
                boolean skipped = false;
-               while(index < toSort.length && points[i].slopeTo(toSort[index]) == currentSlope){
+               while(index < points2.length && points[i].slopeTo(points2[index]) == currentSlope)
+               {
                    count++;
                    index++;
                    skipped = true;
-                   
                }
                if (count >= 3)
                {
@@ -59,45 +47,48 @@ public class FastCollinearPoints {
                    pointsInLine[0] = points[i];
                    for (int k = 0; k < count; k++)
                    {
-                       pointsInLine[k+1] = toSort[initial+k];
+                       pointsInLine[k+1] = points2[initial+k];
                    }
                    Arrays.sort(pointsInLine);
                    LineSegment line = new LineSegment(pointsInLine[0], pointsInLine[pointsInLine.length-1]);
-                   ls.add(line);
-                       
+                   
+                   if (!map.containsKey(currentSlope))
+                   {
+                       //point is not even in a segment check if 
+                       ls.add(line);
+                       ArrayList<Point> temp = new ArrayList<Point>();
+                       temp.add(pointsInLine[pointsInLine.length-1]);
+                       map.put(currentSlope, temp);
+                       N++;
+                   }
+                   else if ( map.containsKey(currentSlope))
+                   {
+                       ArrayList<Point> temp = map.get(currentSlope);
+                       if (temp.contains(pointsInLine[pointsInLine.length-1]))
+                       {
+                           continue;
+                       }
+                       ls.add(line);
+                       N++;
+                       temp.add(pointsInLine[pointsInLine.length-1]);
+                       map.put(currentSlope, temp);
+                   }
+                   if (pointsInLine.length >= points.length)
+                   {
+                       //Nx1 grid or 1xN grid
+                       done = true;
+                       break;
+                   }
                }
                if(!skipped){
                    index++;
                }
            }
-       }
-       ArrayList<LineSegment> noDups = new ArrayList<LineSegment>();
-       for (LineSegment segment : ls)
-       {
-           if (noDups.size() == 0)
+           if (done)
            {
-               noDups.add(segment);
-               N = N+1;
-           }
-           else{
-               Boolean found = false;
-               for (LineSegment seg : noDups)
-               {
-                   if (seg.toString().equals(segment.toString()))
-                   {
-                       found = true;
-                       break;
-                   }
-               }
-               if (!found)
-               {
-                   noDups.add(segment);
-                   N = N+1;
-               }
+               break;
            }
        }
-       ls = noDups;
-       
    }
    private void checkRepeats(Point[] points)
    {
@@ -115,11 +106,14 @@ public class FastCollinearPoints {
            }
        }
    }
-   private void validate(Point p)
+   private void validate(Point[] p)
    {
-       if (p == null)
+       for (int i = 0; i < p.length-1; i++)
        {
-           throw new java.lang.NullPointerException();
+           if (p == null)
+           {
+               throw new java.lang.IllegalArgumentException();
+           }
        }
    }
    public int numberOfSegments()        // the number of line segments
